@@ -15,6 +15,20 @@ export default class App extends Component {
     filter: "",
   };
 
+  componentDidMount() {
+    const persistedContacts = localStorage.getItem("contacts");
+
+    if (persistedContacts) {
+      this.setState({ contacts: JSON.parse(persistedContacts) });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    }
+  }
+
   findContact = (contacts, contact) =>
     contacts.find(
       (item) => item.name.toLowerCase() === contact.name.toLowerCase()
@@ -56,13 +70,13 @@ export default class App extends Component {
     );
   };
 
-  removeContact =(contactId)=>{
+  removeContact = (contactId) => {
     this.setState((prevState) => {
       return {
         contacts: prevState.contacts.filter(({ id }) => id !== contactId),
       };
     });
-  }
+  };
 
   render() {
     const { contacts, filter } = this.state;
@@ -77,7 +91,12 @@ export default class App extends Component {
         {contacts.length > 1 && (
           <Filter value={filter} onChangeFilter={this.changeFilter} />
         )}
-        {visibleContact.length > 0 && <ContactList contacts={visibleContact} onRemoveContact={this.removeContact} />}
+        {visibleContact.length > 0 && (
+          <ContactList
+            contacts={visibleContact}
+            onRemoveContact={this.removeContact}
+          />
+        )}
       </div>
     );
   }
